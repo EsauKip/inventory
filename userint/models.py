@@ -1,13 +1,11 @@
-from email.policy import default
-from enum import unique
-from random import choices
+
 from django.db import models
-from django.contrib.auth.models import(AbstractBaseUser,PermissionsMixin,BaseUserManager)
+
 
 # Create your models here.
 Roles = (("admin","admin"),("creator","creator"),("sale","sale"))
 
-class CustomUserManager(BaseUserManager):
+class CustomUserManager(models.Model):
     def create_superUser(self,email,password,**extra_fields):
         extra_fields.setdefault('is_staff',True)
         extra_fields.setdefault('is_superuser',True)
@@ -23,7 +21,7 @@ class CustomUserManager(BaseUserManager):
         user.save()
         return user 
 
-class CustomUser(AbstractBaseUser,PermissionsMixin):
+class CustomUser(models.Model):
     fullname = models.CharField(max_length=255)
     email = models.EmailField(unique=True)
     role= models.CharField(max_length=8, choices=Roles)
