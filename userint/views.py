@@ -1,6 +1,6 @@
 
 from rest_framework.viewsets import ModelViewSet
-from .serializers import (CreateUserSerializer, CustomUser, LoginSerializer,UpdatePasswordSerializer)
+from .serializers import (CreateUserSerializer, CustomUser, LoginSerializer,UpdatePasswordSerializer,CustomUserSerializer)
 from rest_framework.response import Response
 from rest_framework import status
 from  django.contrib.auth import authenticate
@@ -71,5 +71,15 @@ class UpdatePasswordView(ModelViewSet):
 
 
         return Response({"success":"User password Updated"})    
+
+class MeView(ModelViewSet):
+    serializer_class = CustomUserSerializer
+    http_method_names = ["get"]
+    queryset =CustomUser.objects.all()
+    permission_classes =(IsAuthenticatedCustom,)
+
+    def list(self,request):
+        data = self.serializer_class(request.user).data
+        return Response(data)
 
 
