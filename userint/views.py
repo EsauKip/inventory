@@ -1,6 +1,8 @@
 
 from rest_framework.viewsets import ModelViewSet
-from .serializers import (CreateUserSerializer, CustomUser, LoginSerializer,UpdatePasswordSerializer,CustomUserSerializer)
+from .serializers import (CreateUserSerializer, CustomUser, 
+LoginSerializer,UpdatePasswordSerializer,CustomUserSerializer,
+UserActivities,UserActivitiesSerializer)
 from rest_framework.response import Response
 from rest_framework import status
 from  django.contrib.auth import authenticate
@@ -83,3 +85,20 @@ class MeView(ModelViewSet):
         return Response(data)
 
 
+class UserActivitiesView(ModelViewSet):
+    serializer_class=UserActivitiesSerializer
+    http_method_names = ["get"]
+    queryset =UserActivities.objects.all()
+    permission_classes =(IsAuthenticatedCustom,)
+
+class UsersView(ModelViewSet):
+    serializer_class = CustomUserSerializer
+    http_method_names = ["get"]
+    queryset =CustomUser.objects.all()
+    permission_classes =(IsAuthenticatedCustom,)
+    
+
+    def list(self,request):
+        users = self.queryset().filter(is_superuser=False)
+        data = self.serializer_class(users,many=True).data
+        return Response(data)
