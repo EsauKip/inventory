@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from  django.contrib.auth import authenticate
 from datetime import datetime
+from inventory.utils import get_access_token
 
 class CreateUserView(ModelViewSet):
     http_method_names = ["post"]
