@@ -1,6 +1,6 @@
 
 from rest_framework.viewsets import ModelViewSet
-from .serializers import (CreateUserSerializer, CustomUser, LoginSerializer)
+from .serializers import (CreateUserSerializer, CustomUser, LoginSerializer,UpdatePasswordSerializer)
 from rest_framework.response import Response
 from rest_framework import status
 from  django.contrib.auth import authenticate
@@ -52,4 +52,24 @@ class LoginView(ModelViewSet):
         user.last_login = datetime.now()
         user.save()
         return Response({"access":access},status=status.HTTP_200_OK)            
+
+class UpdatePasswordView(ModelViewSet):
+    serializer_class =UpdatePasswordSerializer
+    http_method_names = ["post"]
+    queryset =CustomUser.objects.all()
+
+    def create(self,request):
+        valid_request = self.serializer_class(data=request.data)
+        valid_request.is_valid(raise_exception=True)
+        user = CustomUser.objects.filter(id=valid_request.validated_data["user_id"])
+        if not user:
+            raise Exception("User with id not found")
+
+        user= user[0]
+        user.set_password(valid_request.validated_data["Password"])
+        user.save()
+
+
+        return Response({"success":"User password Updated"})    
+
 
