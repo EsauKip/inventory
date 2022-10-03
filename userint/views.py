@@ -10,6 +10,14 @@ from datetime import datetime
 from inventory.utils import get_access_token
 from inventory.custom_methods import IsAuthenticatedCustom
 
+def add_user_activity(user,action):
+    UserActivities.objects.create(
+        user_id=user.id,
+        email=user.email,
+        fullname =user.fullname,
+        action=action
+    )
+
 class CreateUserView(ModelViewSet):
     http_method_names = ["post"]
     queryset = CustomUser.objects.all()
@@ -21,6 +29,7 @@ class CreateUserView(ModelViewSet):
         valid_request.is_valid(raise_exception=True)
 
         CustomUser.objects.create(**valid_request.validated_data)
+        add_user_activity(request.user, "added new user")
         return Response({"success": "User created Successfully"}, status=status.HTTP_201_CREATED)
 
 class LoginView(ModelViewSet):
@@ -53,6 +62,7 @@ class LoginView(ModelViewSet):
         access = get_access_token({"user_id":user.id}, 1)
         user.last_login = datetime.now()
         user.save()
+        add_user_activity(user, "user Logged in")
         return Response({"access":access},status=status.HTTP_200_OK)            
 
 class UpdatePasswordView(ModelViewSet):
@@ -70,6 +80,7 @@ class UpdatePasswordView(ModelViewSet):
         user= user[0]
         user.set_password(valid_request.validated_data["Password"])
         user.save()
+        add_user_activity(user, "User Updated Password")
 
 
         return Response({"success":"User password Updated"})    

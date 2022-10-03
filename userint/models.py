@@ -5,6 +5,8 @@ from django.db import models
 # Create your models here.
 Roles = (("admin","admin"),("creator","creator"),("sale","sale"))
 
+
+
 class CustomUserManager(models.Model):
     def create_superUser(self,email,password,**extra_fields):
         extra_fields.setdefault('is_staff',True)
