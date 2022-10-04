@@ -1,3 +1,4 @@
+from enum import unique
 from django.db import models
 from userint.models import CustomUser
 from userint.views import add_user_activity
@@ -30,5 +31,27 @@ class InventoryGroup(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Inventory(models.Model):
+    created_by=models.ForeignKey(CustomUser, null=True, related_name="inventory_groups",
+    on_delete=models.SET_NULL)
+
+    code =models.CharField(max_length=10,unique=True,null=True)
+    photo =models.TextField(blank=True,null=True)
+    group = models.ForeignKey(InventoryGroup,related_name="inventories",null=True,on_delete=models.SET_NULL)
+    total =models.PositiveIntegerField()
+    remaining =models.PositiveIntegerField(null=True)
+    name =models.CharField(max_length=355)
+    price = models.FloatField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now_add=True)
+
+
+    class Meta:
+        ordering =("-created_at")
+
         
+
+
 
