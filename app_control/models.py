@@ -12,7 +12,7 @@ class InventoryGroup(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
     class Meta:
-        ordering =("-created_at")
+        ordering =("-created_at",)
     def __init__(self, *args,**kwargs):
         super().__init__(*args,**kwargs)
         self.old_name = self.name    
@@ -34,7 +34,7 @@ class InventoryGroup(models.Model):
 
 
 class Inventory(models.Model):
-    created_by=models.ForeignKey(CustomUser, null=True, related_name="inventory_groups",
+    created_by=models.ForeignKey(CustomUser, null=True, related_name="inventory_items",
     on_delete=models.SET_NULL)
 
     code =models.CharField(max_length=10,unique=True,null=True)
@@ -49,7 +49,7 @@ class Inventory(models.Model):
 
 
     class Meta:
-        ordering =("-created_at")
+        ordering =("-created_at",)
 
     def save(self,*args,**kwargs):
         is_new =self.pk is None
