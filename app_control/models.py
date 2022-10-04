@@ -51,7 +51,32 @@ class Inventory(models.Model):
     class Meta:
         ordering =("-created_at")
 
-        
+    def save(self,*args,**kwargs):
+        is_new =self.pk is None
 
+        if is_new:
+            self.remaining =self.total
+        super().save(*args,**kwargs)    
+        if is_new:
+            id_length =len(str(self.id))
+            code_length = 6-id_length
+            zeros ="".join("0" for i in range(code_length))
+            self.code = f"BOSE{zeros}{self.id}"
+            self.save()
+
+
+        action =f"added new inventory item with code - '{self.code}'"
+
+        if not is_new:
+            action = f"updated inventory item with code - '{self.code}'"  
+        add_user_activity(self.created_by,action=action)
+
+    def delete(self,*args,**kwargs):
+        created_by=self.created_by
+        action = f"deleted inventory - '{self.code}'"
+        super().delete(*args,**kwargs)
+        add_user_activity(created_by,action=action)             
+    def __str__(self):
+        return f"{self.name} - {self.code}"
 
 
