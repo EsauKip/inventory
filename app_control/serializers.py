@@ -1,3 +1,4 @@
+from typing_extensions import Required
 from .models import InventoryGroup,Inventory
 from userint.serializers import CustomUserSerializer
 from rest_framework import serializers
@@ -18,6 +19,17 @@ class InventoryGroupSerializer(serializers.ModelSerializer):
         if obj.belongs_to is not None:
             return InventoryGroupSerializer(obj.belongs_to).data
         return None
-        
-                
+
+class InventorySerializer(serializers.ModelSerializer):
+    created_by = CustomUserSerializer(read_only=True)
+    created_by_id = serializers.CharField(write_only=True,required=False)
+    # price= serializers.FloatField(Required=True)
+    group = InventoryGroupSerializer(read_only=True)
+    group_id =serializers.CharField(write_only=True)
+
+
+    class Meta:
+        model =Inventory
+        fields = "__all__"
+
 
