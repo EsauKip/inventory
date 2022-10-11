@@ -129,3 +129,5 @@ class InventoryGroupView(ModelViewSet):
 
         request.data.update({"created_by_id":request.user.id})
         return super().create(request, *args,**kwargs)    
+
+

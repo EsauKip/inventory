@@ -107,6 +107,55 @@ class Shop(models.Model):
     def __str__(self):
         return self.name
 
+class Invoice(models.Model):
+    created_by=models.ForeignKey(CustomUser, null=True, related_name="invoices",
+    on_delete=models.SET_NULL)
+    shop = models.ForeignKey(Shop,related_name="sale_shop",null=True,on_delete=models.SET_NULL)
+    created_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        ordering =("-created_at",)
+    def save(self, *args, **kwargs):
+        action = f"add new invoice"
+        
+        super().save(*args,**kwargs)   
+        add_user_activity(self.created_by,action=action)
+
+    def delete(self,*args,**kwargs):
+        created_by=self.created_by
+        action = f"deleted invoice - '{self.id}'"
+        super().delete(*args,**kwargs)
+        add_user_activity(created_by,action=action)        
+
+
+class InvoiceItem(models.Model):
+    invoice = models.ForeignKey(Invoice,related_name="invoice_itens",on_delete=models.CASCADE)
+    item = models.ForeignKey(Inventory,null=True,related_name="inventory_invoices",on_delete=models.SET_NULL)
+    item_name=models.CharField(max_length=255,null=True)
+    item_code=models.CharField(max_length=20,null=True)
+    quantity = models.PositiveBigIntegerField()
+    amount = models.FloatField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        ordering =("-created_at",)
+
+    def save(self,*args,**kwargs):
+        if self.item.remaining < self.quantity:
+            raise Exception(f"item with code {self.item.code} does not have enough quantity")
+        self.item_name = self.item.name
+        self.item_code = self.item.code  
+        self.amount = self.quantity*self.item.price
+        self.item.remaining =self.item.remainig - self.quantity 
+        self.item.save()
+
+        super().save(*args,**kwargs)
+
+    def __str__(self):
+        return f"{self.item_code} - {self.quantity}"             
+
+   
+
+    
+
 
 
 
