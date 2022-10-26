@@ -59,5 +59,28 @@ class InvoiceSerializer(serializers.ModelSerializer):
     shop= ShopSerializer(read_only=True)
     shop_id = serializers.CharField(write_only=True)
     invoice_items=InvoiceItemSerializer(read_only=True,many=True)
+    invoice_item_data =InvoiceItemDataSerializer(write_only=True,many=True)
+    class Meta:
+        model =Invoice
+        fields ="__all__"
+    def create(self,validated_data):
+
+        invoice_item_data=validated_data.pop("invoice_item_data")
+        if not invoice_item_data:
+            raise Exception("provide atleast one invoice Item")
+
+        invoice = super().create(validated_data) 
+        
+        invoice_item_serializer = InvoiceItemSerializer(data=[
+            {"invoice_id": invoice.id, **item} for  item in invoice_item_data
+            ],many=True)
+        if invoice_item_serializer.is_valid():
+            invoice_item_serializer.save()
+        else:
+            invoice.delete()
+            raise Exception(invoice_item_serializer.errors)
+        return invoice        
+
+
 
 
