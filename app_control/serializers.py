@@ -1,5 +1,6 @@
+from dataclasses import fields
 from typing_extensions import Required
-from .models import InventoryGroup,Inventory,Shop
+from .models import InventoryGroup,Inventory,Shop,Invoice,InvoiceItem
 from userint.serializers import CustomUserSerializer
 from rest_framework import serializers
 
@@ -40,4 +41,12 @@ class ShopSerializer(serializers.ModelSerializer):
     class Meta:
         model =Shop
         fields = "__all__"
+class InvoiceItemSerializer(serializers.ModelSerializer):
+    invoice = serializers.CharField(read_only=True)
+    invoice_id = serializers.CharField(write_only=True)
+    item = InventorySerializer(read_only=True)
+    item_id = serializers.CharField(write_only=True)
+    class Meta:
+        model =InvoiceItem
+        fields ="__all__"
 
