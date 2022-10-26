@@ -50,3 +50,14 @@ class InvoiceItemSerializer(serializers.ModelSerializer):
         model =InvoiceItem
         fields ="__all__"
 
+class InvoiceItemDataSerializer(serializers.Serializer):
+    item_id = serializers.CharField()
+    quatity = serializers.IntegerField()
+class InvoiceSerializer(serializers.ModelSerializer):
+    created_by = CustomUserSerializer(read_only=True)
+    created_by_id = serializers.CharField(write_only=True,required=False)
+    shop= ShopSerializer(read_only=True)
+    shop_id = serializers.CharField(write_only=True)
+    invoice_items=InvoiceItemSerializer(read_only=True,many=True)
+
+
